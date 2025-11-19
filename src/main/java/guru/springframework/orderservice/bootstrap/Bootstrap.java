@@ -2,8 +2,11 @@ package guru.springframework.orderservice.bootstrap;
 
 import guru.springframework.orderservice.domain.Customer;
 import guru.springframework.orderservice.domain.OrderHeader;
+import guru.springframework.orderservice.domain.Product;
+import guru.springframework.orderservice.domain.ProductStatus;
 import guru.springframework.orderservice.repositories.CustomerRepository;
 import guru.springframework.orderservice.repositories.OrderHeaderRepository;
+import guru.springframework.orderservice.services.ProductService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -18,8 +21,27 @@ public class Bootstrap implements CommandLineRunner {
     @Autowired
     CustomerRepository customerRepository;
 
+    @Autowired
+    ProductService productService;
+
+    private void updateProduct() {
+        Product product = new Product();
+        product.setDescription("My Product");
+        product.setProductStatus(ProductStatus.NEW);
+
+        Product savedProduct = productService.saveProduct(product);
+
+        // savedProduct.setQuantityOnHand(25);
+
+        Product savedProduct2 = productService.updateQOH(savedProduct.getId(), 25);
+
+        System.out.println("Updated Qty: " + savedProduct2.getQuantityOnHand());
+    }
+
     @Override
     public void run(String... args) throws Exception {
+        updateProduct();
+
         System.out.println("i was called");
         bootstrapOrderService.readOrderData();
 

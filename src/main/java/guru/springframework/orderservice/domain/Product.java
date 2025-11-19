@@ -15,6 +15,8 @@ public class Product extends BaseEntity {
     @ManyToMany(mappedBy = "products")
     private Set<Category> categories;
 
+    private Integer quantityOnHand = 0;
+
     public Set<Category> getCategories() {
         return categories;
     }
@@ -37,6 +39,14 @@ public class Product extends BaseEntity {
 
     public void setProductStatus(ProductStatus productStatus) {
         this.productStatus = productStatus;
+    }
+
+    public Integer getQuantityOnHand() {
+        return quantityOnHand;
+    }
+
+    public void setQuantityOnHand(Integer quantityOnHand) {
+        this.quantityOnHand = quantityOnHand;
     }
 
     @Override
