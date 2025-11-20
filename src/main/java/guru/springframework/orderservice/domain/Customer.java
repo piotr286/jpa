@@ -2,7 +2,8 @@ package guru.springframework.orderservice.domain;
 
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
-import org.hibernate.validator.constraints.Length;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Size;
 
 import java.util.HashSet;
 import java.util.Objects;
@@ -29,13 +30,15 @@ import java.util.Set;
 })
 public class Customer extends BaseEntity {
 
-    @Length(max = 50)
+    @Size(max = 50)
     private String customerName;
     @Valid
     @Embedded
     private Address address;
-    @Length(max = 20)
+    @Size(max = 20)
     private String phone;
+    @Size(max = 255)
+    @Email
     private String email;
 
     @Version
