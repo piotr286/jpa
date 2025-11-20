@@ -90,7 +90,7 @@ class OrderHeaderRepositoryTest {
         OrderHeader savedOrder = orderHeaderRepository.save(orderHeader);
 
         Address newAddress = new Address();
-        newAddress.setCity("New City111111111111111111111111111111111111111111111111111111");
+        newAddress.setCity("New City");
         newAddress.setState("New State");
         newAddress.setAddress("New Address");
         newAddress.setZipCode("11-111");
