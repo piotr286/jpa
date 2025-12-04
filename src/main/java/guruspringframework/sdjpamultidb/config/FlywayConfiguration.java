@@ -7,54 +7,60 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * Created by jt on 7/1/22.
+ */
 @Configuration
 public class FlywayConfiguration {
 
     @Bean
     @ConfigurationProperties("spring.card.flyway")
-    public DataSourceProperties cardFlywayDataSourceProperties() {
+    public DataSourceProperties cardFlywayDataSourceProps(){
         return new DataSourceProperties();
+    }
+
+    @Bean(initMethod = "migrate")
+    public Flyway flywayCard(@Qualifier("cardFlywayDataSourceProps")
+                             DataSourceProperties cardFlywayDataSourceProps){
+        return Flyway.configure()
+                .dataSource(cardFlywayDataSourceProps.getUrl(),
+                        cardFlywayDataSourceProps.getUsername(),
+                        cardFlywayDataSourceProps.getPassword())
+                .locations("classpath:/db/migration/card")
+                .load();
     }
 
     @Bean
     @ConfigurationProperties("spring.cardholder.flyway")
-    public DataSourceProperties cardHolderFlywayDataSourceProperties() {
+    public DataSourceProperties cardholderFlywayDataSourceProps(){
         return new DataSourceProperties();
+    }
+
+    @Bean(initMethod = "migrate")
+    public Flyway flywayCardHolder(@Qualifier("cardholderFlywayDataSourceProps")
+                                   DataSourceProperties cardholderFlywayDataSourceProps){
+        return Flyway.configure()
+                .dataSource(cardholderFlywayDataSourceProps.getUrl(),
+                        cardholderFlywayDataSourceProps.getUsername(),
+                        cardholderFlywayDataSourceProps.getPassword())
+                .locations("classpath:/db/migration/cardholder")
+                .load();
     }
 
     @Bean
     @ConfigurationProperties("spring.pan.flyway")
-    public DataSourceProperties panFlywayDataSourceProperties() {
+    public DataSourceProperties panFlywayDataSourceProps(){
         return new DataSourceProperties();
     }
 
     @Bean(initMethod = "migrate")
-    public Flyway flywayCard(@Qualifier("cardFlywayDataSourceProperties") DataSourceProperties cardFlywayDataSourceProperties) {
+    public Flyway flywayPan(@Qualifier("panFlywayDataSourceProps")
+                            DataSourceProperties panFlywayDataSourceProps){
         return Flyway.configure()
-                .dataSource(cardFlywayDataSourceProperties.getUrl(),
-                        cardFlywayDataSourceProperties.getUsername(),
-                        cardFlywayDataSourceProperties.getPassword())
-                .locations("classpath:db/migration/card")
-                .load();
-    }
-
-    @Bean(initMethod = "migrate")
-    public Flyway flywayCardHolder(@Qualifier("cardHolderFlywayDataSourceProperties") DataSourceProperties cardHolderFlywayDataSourceProperties) {
-        return Flyway.configure()
-                .dataSource(cardHolderFlywayDataSourceProperties.getUrl(),
-                        cardHolderFlywayDataSourceProperties.getUsername(),
-                        cardHolderFlywayDataSourceProperties.getPassword())
-                .locations("classpath:db/migration/cardholder")
-                .load();
-    }
-
-    @Bean(initMethod = "migrate")
-    public Flyway flywayPan(@Qualifier("panFlywayDataSourceProperties") DataSourceProperties panFlywayDataSourceProperties) {
-        return Flyway.configure()
-                .dataSource(panFlywayDataSourceProperties.getUrl(),
-                        panFlywayDataSourceProperties.getUsername(),
-                        panFlywayDataSourceProperties.getPassword())
-                .locations("classpath:db/migration/pan")
+                .dataSource(panFlywayDataSourceProps.getUrl(),
+                        panFlywayDataSourceProps.getUsername(),
+                        panFlywayDataSourceProps.getPassword())
+                .locations("classpath:/db/migration/pan")
                 .load();
     }
 }

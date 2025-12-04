@@ -14,11 +14,15 @@ import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.sql.DataSource;
+import java.util.Properties;
 
+/**
+ * Created by jt on 7/1/22.
+ */
 @EnableJpaRepositories(basePackages = "guruspringframework.sdjpamultidb.repositories.creditcard",
-entityManagerFactoryRef = "cardEntityManagerFactory", transactionManagerRef = "cardTransactionManager")
+        entityManagerFactoryRef = "cardEntityManagerFactory", transactionManagerRef = "cardTransactionManager")
 @Configuration
-public class CardDatabaseDatabaseConfiguration {
+public class CardDatabaseConfiguration {
 
     @Bean
     @ConfigurationProperties("spring.card.datasource")
@@ -27,7 +31,8 @@ public class CardDatabaseDatabaseConfiguration {
     }
 
     @Bean
-    public DataSource cardDataSource(@Qualifier("cardDataSourceProperties")  DataSourceProperties cardDataSourceProperties) {
+    @ConfigurationProperties("spring.card.datasource.hikari")
+    public DataSource cardDataSource(@Qualifier("cardDataSourceProperties") DataSourceProperties cardDataSourceProperties){
         return cardDataSourceProperties.initializeDataSourceBuilder()
                 .type(HikariDataSource.class)
                 .build();
@@ -36,16 +41,28 @@ public class CardDatabaseDatabaseConfiguration {
     @Bean
     public LocalContainerEntityManagerFactoryBean cardEntityManagerFactory(
             @Qualifier("cardDataSource") DataSource cardDataSource,
-            EntityManagerFactoryBuilder builder) {
-        return builder.dataSource(cardDataSource)
-                .packages(CreditCard.class)
-                .persistenceUnit("card")
-                .build();
+            EntityManagerFactoryBuilder builder){
+
+        Properties props = new Properties();
+        props.put("hibernate.hbm2ddl.auto", "validate");
+        props.put("hibernate.physical_naming_strategy",
+                "org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy");
+
+        LocalContainerEntityManagerFactoryBean efb =
+                builder.dataSource(cardDataSource)
+                        .packages(CreditCard.class)
+                        .persistenceUnit("card")
+                        .build();
+
+        efb.setJpaProperties(props);
+
+        return efb;
     }
 
     @Bean
     public PlatformTransactionManager cardTransactionManager(
-            @Qualifier("cardEntityManagerFactory") LocalContainerEntityManagerFactoryBean cardEntityManagerFactory) {
+            @Qualifier("cardEntityManagerFactory") LocalContainerEntityManagerFactoryBean cardEntityManagerFactory){
+
         return new JpaTransactionManager(cardEntityManagerFactory.getObject());
     }
 }
